@@ -1,139 +1,86 @@
-import { Table, Tag, Space, Button, Modal } from 'antd';
-import React,{ useState } from 'react'
+import React, { useState } from 'react';
+import { Table, Radio, Divider } from 'antd';
 
+const columns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    render: (text) => <a>{text}</a>,
+  },
+  {
+    title: 'Age',
+    dataIndex: 'age',
+  },
+  {
+    title: 'Address',
+    dataIndex: 'address',
+  },
+];
+const data = [
+  {
+    key: '1',
+    name: 'John Brown',
+    age: 32,
+    address: 'New York No. 1 Lake Park',
+  },
+  {
+    key: '2',
+    name: 'Jim Green',
+    age: 42,
+    address: 'London No. 1 Lake Park',
+  },
+  {
+    key: '3',
+    name: 'Joe Black',
+    age: 32,
+    address: 'Sidney No. 1 Lake Park',
+  },
+  {
+    key: '4',
+    name: 'Disabled User',
+    age: 99,
+    address: 'Sidney No. 1 Lake Park',
+  },
+]; // rowSelection object indicates the need for row selection
 
-export default function TableDemo() {
+const rowSelection = {
+  selectedRowKeys: [111, 222],
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(selectedRowKeys, selectedRows);
+  },
+  // getCheckboxProps: (record) => ({
+  //   disabled: record.name === 'Disabled User',
+  //   // Column configuration not to be checked
+  //   name: record.name,
+  // }),
+};
 
-    const columns = [
-    {
-        title: 'Name',
-        dataIndex: 'name',  // 这个和 render 渲染函数有关
-        key: 'name',
-        //  参数分别为当前行的值，当前行数据，行索引
-        render: (text, record, index) => {
-            // console.log(text);
-            // console.log(record);
-            // console.log(index);
-            return <a href="javascript">{text}</a>
-        },
-    },
-    {
-        title: 'Age',
-        dataIndex: 'age',
-        key: 'age',
-        render: (text, row, index) => {
-            return <h1>{text}</h1>
-        }
-    },
-    {
-        title: 'Address',
-        dataIndex: 'address',
-        key: 'address',
-    },
-    {
-        title: 'Tags',
-        key: 'tags',
-        dataIndex: 'tags',
-        render: tags => (
-        <>
-            {tags.map(tag => {
-            let color = tag.length > 5 ? 'geekblue' : 'green';
-            if (tag === 'loser') {
-                color = 'volcano';
-            }
-            return (
-                <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-                </Tag>
-            );
-            })}
-        </>
-        ),
-    },
-    {
-        title: 'Action',
-        key: 'action',
-        render: (text, record) => (
-        <Space size="middle">
-            <a href="w">Invite {record.name}</a>
-            <a href="w">Delete</a>
-        </Space>
-        ),
-    },
-    {
-        title: 'Demo',
-        key: 'demo',
-        render: (row, index) => {
-            return <Button type="primary" onClick={headleClick(row, index)}>点击修改</Button>
-        }
-    }
-    ];
-    
-    // 数据数组
-    const data = [
-    {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        tags: ['nice', 'developer'],
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        tags: ['loser'],
-    },
-    {
-        key: '3',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-        tags: ['cool', 'teacher'],
-    },
-    ];
+const TableDemo = () => {
+  const [selectionType, setSelectionType] = useState('checkbox');
+  return (
+    <div>
+      <Radio.Group
+        onChange={({ target: { value } }) => {
+          setSelectionType(value);
+        }}
+        value={selectionType}
+      >
+        <Radio value="checkbox">Checkbox</Radio>
+        <Radio value="radio">radio</Radio>
+      </Radio.Group>
 
-    
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [obj, setObj] = useState({})
+      <Divider />
 
-    const handleOk = () => {
-        setIsModalVisible(false);
-    };
+      <Table
+        rowSelection={{
+          type: selectionType,
+          ...rowSelection,
+        }}
+        columns={columns}
+        dataSource={data}
+      />
+    </div>
+  );
+};
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
-    const headleClick = (row,index) => {
-        return () => {
-            console.log(row);
-            setIsModalVisible(true);
-            setObj(row)
-        }
-    }
-    
-    return (
-        <>
-            <Table columns={columns} dataSource={data} />  
-            <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-                {
-                    obj === {} ? '' : 
-                    <>  
-                        <p>{obj.key}</p>
-                        <p>{obj.name}</p>
-                        <p>{obj.age}</p>
-                        <p>{obj.address}</p>
-                        <p>{obj.tags}</p>
-                        {/* {
-                            obj.tags.map(item => {
-                                return <h3 key={item}>{item}</h3>
-                            })
-                        } */}
-                    </>
-                }
-            </Modal>
-        </>
-    )
-}
+export default TableDemo
